@@ -40,7 +40,7 @@ A unified, high-performance i18next CLI toolchain, powered by SWC.
 - **Translation Status**: Get a high-level overview or a detailed, key-by-key report of your project's translation completeness.
 - **Plugin System**: Extensible architecture for custom extraction patterns and file types (e.g., HTML, Handlebars).
 - **Legacy Migration**: Automatic migration from `i18next-parser` configurations.
-- **Cloud Integration**: Seamless integration with the [locize](https://locize.com) translation management platform.
+- **Cloud Integration**: Seamless integration with the [Locize](https://locize.com) translation management platform.
 
 ## Installation
 
