@@ -442,8 +442,11 @@ describe('extractor: advanced Trans features', () => {
     const translationFile = results.find(r => pathEndsWith(r.path, '/locales/en/translation.json'))
 
     expect(translationFile).toBeDefined()
+    // {{count: messageCount}} is inlined without a count prop — react-i18next
+    // v16.4.0 infers count at runtime, so the extractor now generates plural keys.
     expect(translationFile!.newTranslations).toEqual({
-      greeting: 'Hello {{name}}, you have {{count}} messages',
+      greeting_one: 'Hello {{name}}, you have {{count}} messages',
+      greeting_other: 'Hello {{name}}, you have {{count}} messages',
     })
   })
 
@@ -2124,9 +2127,13 @@ describe('extractor: advanced Trans features', () => {
     const translationFile = results.find(r => pathEndsWith(r.path, '/locales/en/translation.json'))
 
     expect(translationFile).toBeDefined()
-    // Should extract {{count}} items, not {{value}} items
+    // {{count: count as any}} has key 'count' — the TsAsExpression wrapper is
+    // stripped and the ObjectExpression is recognised as an inline count
+    // interpolation (react-i18next v16.4.0 inference).  Plural keys are generated.
+    // The primary assertion here is still that the key name is {{count}}, not {{value}}.
     expect(translationFile!.newTranslations).toEqual({
-      items: '<0>{{count}}</0> items',
+      items_one: '<0>{{count}}</0> items',
+      items_other: '<0>{{count}}</0> items',
     })
   })
 

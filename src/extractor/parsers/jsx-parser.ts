@@ -193,7 +193,14 @@ export function extractFromTransComponent (node: JSXElement, config: I18nextTool
     valuesCountProperty = getObjectPropValueExpression(valuesAttr.value.expression, 'count')
   }
 
-  const hasCount = !!countAttr || !!valuesCountProperty
+  // Mirror react-i18next v16.4.0: infer count from inline {{ count }} children
+  // when no explicit `count` prop or `values={{ count }}` is present.
+  // The runtime check is `typeof valuesFromChildren.count === 'number'`; at
+  // extraction time we can only inspect the AST shape, so we look for any
+  // ObjectExpression interpolation that declares a `count` key.
+  const hasInlineCount = !countAttr && !valuesCountProperty && childrenHaveInlineCount(node.children)
+
+  const hasCount = !!countAttr || !!valuesCountProperty || hasInlineCount
 
   const tOptionsAttr = node.opening.attributes?.find(
     (attr) =>
@@ -482,6 +489,73 @@ function swcChildToReactNode (node: JSXElementChild): string | ReactElement | nu
 
 function swcChildrenToReactNodes (children: JSXElementChild[]): (string | ReactElement)[] {
   return children.map(swcChildToReactNode).filter(n => n !== null)
+}
+
+/**
+ * Unwraps TypeScript type-assertion and parenthesis wrappers from a JSX
+ * expression so callers can inspect the underlying node type.
+ *
+ * Handles:
+ *   `{{ count } as any}`          → TsAsExpression wrapping ObjectExpression
+ *   `{{ count } as TransInterpolation}` → same
+ *   `({{ count }})`               → ParenthesisExpression wrapping ObjectExpression
+ */
+function unwrapJSXExpression (expr: JSXExpression): JSXExpression {
+  if (expr.type === 'TsAsExpression' || expr.type === 'TsSatisfiesExpression') {
+    return unwrapJSXExpression(expr.expression as JSXExpression)
+  }
+  if (expr.type === 'ParenthesisExpression') {
+    return unwrapJSXExpression(expr.expression as JSXExpression)
+  }
+  return expr
+}
+
+/**
+ * Recursively walks JSX children to determine whether any interpolation
+ * object contains a `count` property — mirroring the runtime behaviour of
+ * react-i18next v16.4.0's `getValuesFromChildren`.
+ *
+ * This lets the extractor infer `hasCount = true` when a `{{ count }}`
+ * (or `{{ count: expr }}`) interpolation is present in children without an
+ * explicit `count` prop on the `<Trans>` component.
+ *
+ * Matches:
+ *   `{{ count }}`               — shorthand Identifier  (prop.type === 'Identifier')
+ *   `{{ count: someExpr }}`     — KeyValueProperty with Identifier key
+ *   `{{ count } as any}`        — TsAsExpression-wrapped ObjectExpression
+ *   Deeply nested in child JSX elements (e.g. `<strong>{{ count }}</strong>`)
+ *
+ * @param children - The JSX children array to search
+ * @returns `true` when a `count` interpolation is found anywhere in the tree
+ */
+function childrenHaveInlineCount (children: JSXElementChild[]): boolean {
+  for (const child of children) {
+    if (child.type === 'JSXExpressionContainer') {
+      const inner = unwrapJSXExpression(child.expression)
+      if (inner.type === 'ObjectExpression') {
+        const hasCount = inner.properties.some(prop => {
+          if (prop.type === 'KeyValueProperty') {
+            // { count: expr }
+            return (
+              (prop.key.type === 'Identifier' || prop.key.type === 'StringLiteral') &&
+              prop.key.value === 'count'
+            )
+          }
+          if (prop.type === 'Identifier') {
+            // shorthand { count }
+            return prop.value === 'count'
+          }
+          return false
+        })
+        if (hasCount) return true
+      }
+    } else if (child.type === 'JSXElement') {
+      if (childrenHaveInlineCount(child.children)) return true
+    } else if (child.type === 'JSXFragment') {
+      if (childrenHaveInlineCount(child.children)) return true
+    }
+  }
+  return false
 }
 
 function serializeJSXChildren (children: JSXElementChild[], config: I18nextToolkitConfig): string {

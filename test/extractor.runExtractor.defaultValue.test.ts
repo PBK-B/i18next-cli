@@ -685,7 +685,10 @@ describe('runExtractor: defaultValue option', () => {
     expect(deTranslations).toEqual({
       'Children as key and default': '[DE] translation/Children as key and default',
       complex: {
-        jsx: '[DE] translation/complex.jsx',
+        // {{count}} is inlined without a count prop — react-i18next v16.4.0
+        // infers count from children, so the extractor now generates plural keys.
+        jsx_one: '[DE] translation/complex.jsx_one',
+        jsx_other: '[DE] translation/complex.jsx_other',
       },
       explicit: {
         key: 'Existing German Translation', // Preserved existing translation
@@ -708,7 +711,10 @@ describe('runExtractor: defaultValue option', () => {
     expect(frTranslations).toEqual({
       'Children as key and default': '[FR] translation/Children as key and default',
       complex: {
-        jsx: '[FR] translation/complex.jsx',
+        jsx_one: '[FR] translation/complex.jsx_one',
+        jsx_other: '[FR] translation/complex.jsx_other',
+        // French has three cardinal forms (one / many / other)
+        jsx_many: '[FR] translation/complex.jsx_many',
       },
       explicit: {
         key: '[FR] translation/explicit.key',
@@ -746,7 +752,8 @@ describe('runExtractor: defaultValue option', () => {
     expect(enTranslations).toEqual({
       'Children as key and default': '[EN] translation/Children as key and default',
       complex: {
-        jsx: 'Hello <1>{{name}}</1>, you have <3>{{count}} messages</3>!', // Serialized JSX (Link becomes <3>)
+        jsx_one: 'Hello <1>{{name}}</1>, you have <3>{{count}} messages</3>!', // Serialized JSX (Link becomes <3>)
+        jsx_other: 'Hello <1>{{name}}</1>, you have <3>{{count}} messages</3>!',
       },
       explicit: {
         key: 'Explicit Default', // Uses explicit defaults prop

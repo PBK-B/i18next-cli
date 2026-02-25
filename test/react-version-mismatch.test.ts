@@ -23,7 +23,7 @@ import { nodesToString, getDefaults } from 'react-i18next'
 // ---------------------------------------------------------------------------
 // 1) Direct nodesToString test — proves the root cause without any mocking
 // ---------------------------------------------------------------------------
-describe('React 18/19 $$typeof mismatch (issue #179)', () => {
+describe('React 18/19 $$typeof mismatch', () => {
   it('nodesToString should recognise elements regardless of $$typeof symbol', () => {
     // In this dev environment react-i18next resolves to React 19, which
     // recognises only Symbol.for('react.transitional.element').
@@ -147,7 +147,10 @@ describe('extraction with React version mismatch (issue #179)', () => {
 
     expect(translationFile).toBeDefined()
 
-    const value = translationFile!.newTranslations.userMessagesUnread
+    // The Trans has {{ count }} inlined without a count prop — react-i18next
+    // v16.4.0 infers count from children, so the extractor now generates
+    // plural keys.  We inspect the _one form; both forms have the same content.
+    const value = translationFile!.newTranslations.userMessagesUnread_one
 
     // With the fix: elements are built with the correct $$typeof so
     // nodesToString serialises them as indexed tags.
