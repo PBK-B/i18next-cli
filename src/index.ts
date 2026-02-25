@@ -1,6 +1,8 @@
 export type {
   I18nextToolkitConfig,
   Plugin,
+  LinterPlugin,
+  LintIssue,
   PluginContext,
   ExtractedKey,
   TranslationResult,

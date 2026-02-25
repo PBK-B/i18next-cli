@@ -1,7 +1,7 @@
 import { vol } from 'memfs'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Linter, runLinter } from '../src/linter'
-import type { I18nextToolkitConfig } from '../src/index'
+import type { I18nextToolkitConfig, Plugin } from '../src/index'
 
 // --- MOCKS ---
 vi.mock('fs/promises', async () => {
@@ -1362,5 +1362,139 @@ describe('Linter (core logic)', () => {
 
     // Each call site must have its own distinct line number
     expect(lines).toEqual([4, 5, 6])
+  })
+
+  it('should run lintSetup once and apply lintOnLoad transforms', async () => {
+    let setupCalls = 0
+    const plugin: Plugin = {
+      name: 'lint-setup-and-transform',
+      lintSetup: async () => {
+        setupCalls += 1
+      },
+      lintOnLoad: async (code, filePath) => {
+        if (filePath.endsWith('.tsx')) {
+          return '<p>Text from transformed tsx</p>'
+        }
+        return code
+      }
+    }
+
+    const { glob } = await import('glob')
+    vi.mocked(glob).mockResolvedValue(['/src/App.tsx'])
+    vol.fromJSON({ '/src/App.tsx': '<Trans>This should be ignored</Trans>' })
+
+    const config: I18nextToolkitConfig = {
+      ...mockConfig,
+      extract: {
+        ...mockConfig.extract,
+        input: ['src/**/*.tsx']
+      },
+      plugins: [plugin]
+    }
+
+    const result = await runLinter(config)
+
+    expect(setupCalls).toBe(1)
+    expect(result.success).toBe(false)
+    expect(result.files['/src/App.tsx']).toHaveLength(1)
+    expect(result.files['/src/App.tsx'][0].text).toBe('Text from transformed tsx')
+  })
+
+  it('should skip a file when lintOnLoad returns null', async () => {
+    const plugin: Plugin = {
+      name: 'lint-skip-file',
+      lintOnLoad: async () => null
+    }
+
+    const { glob } = await import('glob')
+    vi.mocked(glob).mockResolvedValue(['/src/App.tsx'])
+    vol.fromJSON({ '/src/App.tsx': '<p>This should be skipped</p>' })
+
+    const config: I18nextToolkitConfig = {
+      ...mockConfig,
+      plugins: [plugin]
+    }
+
+    const result = await runLinter(config)
+    expect(result.success).toBe(true)
+    expect(Object.keys(result.files)).toHaveLength(0)
+  })
+
+  it('should apply lintExtensions as a skip hint', async () => {
+    const tsOnlyPlugin: Plugin = {
+      name: 'ts-only-lint-plugin',
+      lintExtensions: ['.ts'],
+      lintOnLoad: async () => 'const msg = "from ts plugin"'
+    }
+
+    const { glob } = await import('glob')
+    vi.mocked(glob).mockResolvedValue(['/src/App.tsx'])
+    vol.fromJSON({ '/src/App.tsx': '<p>Text in jsx</p>' })
+
+    const config: I18nextToolkitConfig = {
+      ...mockConfig,
+      plugins: [tsOnlyPlugin]
+    }
+
+    const result = await runLinter(config)
+    expect(result.success).toBe(false)
+    expect(result.files['/src/App.tsx']).toHaveLength(1)
+    expect(result.files['/src/App.tsx'][0].text).toBe('Text in jsx')
+  })
+
+  it('should allow lintOnResult to filter issues', async () => {
+    const plugin: Plugin = {
+      name: 'lint-filter',
+      lintOnResult: async (_file, issues) => issues.filter(issue => issue.type === 'interpolation')
+    }
+
+    const config: I18nextToolkitConfig = {
+      ...mockConfig,
+      extract: {
+        ...mockConfig.extract,
+        input: ['src/**/*.tsx'],
+        functions: ['t']
+      },
+      plugins: [plugin]
+    }
+
+    const sampleCode = [
+      '<p>Hardcoded jsx text</p>',
+      't("Hello {{name}}")'
+    ].join('\n')
+
+    vol.fromJSON({ '/src/App.tsx': sampleCode })
+
+    const result = await runLinter(config)
+    expect(result.success).toBe(false)
+    expect(result.files['/src/App.tsx']).toHaveLength(1)
+    expect(result.files['/src/App.tsx'][0].type).toBe('interpolation')
+  })
+
+  it('should emit an error and continue when lint plugin throws', async () => {
+    const plugin: Plugin = {
+      name: 'lint-throws',
+      lintOnLoad: async () => {
+        throw new Error('plugin boom')
+      }
+    }
+
+    const config: I18nextToolkitConfig = {
+      ...mockConfig,
+      plugins: [plugin]
+    }
+    vol.fromJSON({ '/src/App.tsx': '<p>Still lint this text</p>' })
+
+    const linter = new Linter(config)
+    const errorSpy = vi.fn()
+    linter.on('error', errorSpy)
+
+    const result = await linter.run()
+
+    expect(errorSpy).toHaveBeenCalledTimes(1)
+    expect((errorSpy.mock.calls[0][0] as Error).message).toContain('Linter failed to run: plugin boom')
+    expect(result.success).toBe(false)
+    expect(result.files['/src/App.tsx']).toHaveLength(1)
+    expect(result.files['/src/App.tsx'][0].text).toBe('Still lint this text')
   })
 })
