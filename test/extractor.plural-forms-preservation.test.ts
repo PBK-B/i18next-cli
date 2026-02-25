@@ -54,7 +54,7 @@ describe('plural form preservation across locales with --sync-primary', () => {
 
     // First run: Initial extraction
     const updated1 = await runExtractor(config, { isDryRun: false })
-    expect(updated1).toBe(true)
+    expect(updated1.anyFileUpdated).toBe(true)
 
     const enPath = join(tempDir, 'locales', 'en.json')
     const plPath = join(tempDir, 'locales', 'pl.json')

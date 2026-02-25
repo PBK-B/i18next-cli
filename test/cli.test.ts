@@ -96,7 +96,7 @@ describe('CLI command parsing and dispatching', () => {
 
     mockEnsureConfig.mockResolvedValue(validMockConfig)
     // Simulate runExtractor returning `true` (files were updated)
-    mockRunExtractor.mockResolvedValue(true)
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: true, hasErrors: false })
 
     await import('../src/cli')
 
@@ -104,6 +104,48 @@ describe('CLI command parsing and dispatching', () => {
     await new Promise(resolve => setImmediate(resolve))
 
     // Assert that the CI-specific exit code is called
+    expect(exitSpy).toHaveBeenCalledWith(1)
+  })
+
+  it('should exit with code 1 when hasErrors is true even if no files were updated', async () => {
+    vi.resetModules()
+    process.argv = ['node', 'cli.ts', 'extract']
+
+    mockEnsureConfig.mockResolvedValue(validMockConfig)
+    // Simulate a run where a file failed to parse but no output files changed
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: true })
+
+    await import('../src/cli')
+    await new Promise(resolve => setImmediate(resolve))
+
+    expect(exitSpy).toHaveBeenCalledWith(1)
+  })
+
+  it('should NOT exit with code 1 when extraction succeeds with no errors', async () => {
+    vi.resetModules()
+    process.argv = ['node', 'cli.ts', 'extract']
+
+    mockEnsureConfig.mockResolvedValue(validMockConfig)
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: false })
+
+    await import('../src/cli')
+    await new Promise(resolve => setImmediate(resolve))
+
+    expect(exitSpy).not.toHaveBeenCalled()
+  })
+
+  it('should exit with code 1 when --ci flag is set and hasErrors is true even with no file updates', async () => {
+    vi.resetModules()
+    process.argv = ['node', 'cli.ts', 'extract', '--ci']
+
+    mockEnsureConfig.mockResolvedValue(validMockConfig)
+    // No files updated, but a parse error occurred
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: true })
+
+    await import('../src/cli')
+    await new Promise(resolve => setImmediate(resolve))
+
+    // CI should still fail because of the parse error
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
 
@@ -161,7 +203,7 @@ describe('CLI command parsing and dispatching', () => {
     process.argv = ['node', 'cli.ts', 'extract', '--sync-primary']
 
     mockEnsureConfig.mockResolvedValue(validMockConfig)
-    mockRunExtractor.mockResolvedValue(false)
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: false })
 
     await import('../src/cli')
 
@@ -200,7 +242,7 @@ describe('CLI command parsing and dispatching', () => {
     }
 
     mockEnsureConfig.mockResolvedValue(watchConfig)
-    mockRunExtractor.mockResolvedValue(false)
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: false })
 
     await import('../src/cli')
 
@@ -243,7 +285,7 @@ describe('CLI command parsing and dispatching', () => {
     }
 
     mockEnsureConfig.mockResolvedValue(watchConfig)
-    mockRunExtractor.mockResolvedValue(false)
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: false })
 
     await import('../src/cli')
     await new Promise(resolve => setImmediate(resolve))
@@ -269,7 +311,7 @@ describe('CLI command parsing and dispatching', () => {
     vi.resetModules()
     process.argv = ['node', 'cli.ts', 'extract', '--config', './config/i18next.config.ts']
     mockEnsureConfig.mockResolvedValue(validMockConfig)
-    mockRunExtractor.mockResolvedValue(false)
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: false })
 
     await import('../src/cli')
     await new Promise(resolve => setImmediate(resolve))
@@ -281,7 +323,7 @@ describe('CLI command parsing and dispatching', () => {
     vi.resetModules()
     process.argv = ['node', 'cli.ts', 'extract', '-c', './cfg.js']
     mockEnsureConfig.mockResolvedValue(validMockConfig)
-    mockRunExtractor.mockResolvedValue(false)
+    mockRunExtractor.mockResolvedValue({ anyFileUpdated: false, hasErrors: false })
 
     await import('../src/cli')
     await new Promise(resolve => setImmediate(resolve))

@@ -163,8 +163,8 @@ describe('extractor: JSX Trans conditional expression causes file skip', () => {
     } as any
 
     // Run non-dry so files are written into memfs for assertions
-    const updated = await runExtractor(config, { isDryRun: false }, logger)
-    expect(updated).toBe(true)
+    const updated = await runExtractor(config, { isDryRun: false, logger })
+    expect(updated.anyFileUpdated).toBe(true)
 
     const warnCalls = (logger.warn as any).mock.calls.map((args: any[]) => args.join(' ')).join('\n')
 

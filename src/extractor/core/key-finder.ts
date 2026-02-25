@@ -37,7 +37,8 @@ import { ExpressionResolver } from '../parsers/expression-resolver'
  */
 export async function findKeys (
   config: I18nextToolkitConfig,
-  logger: Logger = new ConsoleLogger()
+  logger: Logger = new ConsoleLogger(),
+  fileErrors?: string[]
 ): Promise<{ allKeys: Map<string, ExtractedKey>, objectKeys: Set<string> }> {
   const { plugins: pluginsOrUndefined, ...otherConfig } = config
   const plugins = pluginsOrUndefined || []
@@ -95,7 +96,7 @@ export async function findKeys (
 
   // 6. Process each file
   for (const file of sourceFiles) {
-    await processFile(file, plugins, astVisitors, pluginContext, otherConfig, logger)
+    await processFile(file, plugins, astVisitors, pluginContext, otherConfig, logger, fileErrors)
   }
 
   // 7. Run onEnd hooks

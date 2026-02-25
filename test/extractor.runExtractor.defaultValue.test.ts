@@ -77,7 +77,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check the German translation file
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -154,7 +154,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check secondary languages get empty strings
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -212,7 +212,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check that all keys from different sources get the same defaultValue treatment in secondary languages
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -280,7 +280,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
     const deTranslations = JSON.parse(deContent)
@@ -332,7 +332,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check the German translation file
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -417,7 +417,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check the common namespace
     const commonDeContent = await fs.readFile(join(tempDir, 'locales', 'de', 'common.json'), 'utf-8')
@@ -478,7 +478,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check the greetings namespace
     const greetingsDeContent = await fs.readFile(join(tempDir, 'locales', 'de', 'greetings.json'), 'utf-8')
@@ -534,7 +534,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Should fallback to empty string when function throws
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -584,7 +584,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
     const deTranslations = JSON.parse(deContent)
@@ -676,7 +676,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check the German translation file
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -808,7 +808,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Secondary language should use function-generated defaults
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -865,7 +865,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check translations with pluralization and context in secondary language
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -930,7 +930,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check app namespace
     const appDeContent = await fs.readFile(join(tempDir, 'locales', 'de', 'app.json'), 'utf-8')
@@ -1018,7 +1018,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check app namespace with conflict resolution
     const appDeContent = await fs.readFile(join(tempDir, 'locales', 'de', 'app.json'), 'utf-8')
@@ -1115,7 +1115,7 @@ describe('runExtractor: defaultValue option', () => {
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
 
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     // Check the German translation file
     const deContent = await fs.readFile(join(tempDir, 'locales', 'de', 'translation.json'), 'utf-8')
@@ -1232,7 +1232,7 @@ describe('runExtractor: defaultValue option', () => {
     }
 
     const wasUpdated = await runExtractor(config, { isDryRun: false })
-    expect(wasUpdated).toBe(true)
+    expect(wasUpdated.anyFileUpdated).toBe(true)
 
     const enContent = await fs.readFile(join(tempDir, 'locales', 'en', 'translation.json'), 'utf-8')
     const enTranslations = JSON.parse(enContent)

@@ -746,7 +746,7 @@ describe('extractor: runExtractor', () => {
     expect(writeFileSpy).not.toHaveBeenCalled()
 
     // 2. The function should still report that an update *would* have happened.
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     writeFileSpy.mockRestore()
   })
@@ -2380,7 +2380,7 @@ describe('extractor: runExtractor', () => {
       }
 
       const updatedA = await runExtractor(configA, { isDryRun: false })
-      expect(updatedA).toBe(true)
+      expect(updatedA.anyFileUpdated).toBe(true)
 
       const contentA = await vol.promises.readFile(resolve('/', 'locales/en.json'), 'utf8')
 
@@ -2421,7 +2421,7 @@ describe('extractor: runExtractor', () => {
       }
 
       const updatedB = await runExtractor(configB, { isDryRun: false })
-      expect(updatedB).toBe(true)
+      expect(updatedB.anyFileUpdated).toBe(true)
 
       const contentB = await vol.promises.readFile(resolve('/', 'locales/en.json'), 'utf8')
 

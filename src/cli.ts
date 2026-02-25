@@ -45,7 +45,7 @@ program
       const runExtract = async () => {
         // --sync-all implies sync-primary behavior
         const syncPrimary = !!options.syncPrimary || !!options.syncAll
-        const success = await runExtractor(config, {
+        const { anyFileUpdated, hasErrors } = await runExtractor(config, {
           isWatchMode: !!options.watch,
           isDryRun: !!options.dryRun,
           syncPrimaryWithDefaults: syncPrimary,
@@ -53,15 +53,19 @@ program
           quiet: !!options.quiet
         })
 
-        if (options.ci && !success) {
+        if (options.ci && !anyFileUpdated) {
           console.log('✅ No files were updated.')
-          process.exit(0)
-        } else if (options.ci && success) {
+          process.exit(hasErrors ? 1 : 0)
+        } else if (options.ci && anyFileUpdated) {
           console.error('❌ Some files were updated. This should not happen in CI mode.')
           process.exit(1)
         }
 
-        return success
+        if (hasErrors && !options.watch) {
+          process.exit(1)
+        }
+
+        return anyFileUpdated
       }
 
       // Run the extractor once initially

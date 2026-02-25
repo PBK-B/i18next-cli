@@ -1138,8 +1138,8 @@ const config: I18nextToolkitConfig = {
 };
 
 // Run the complete extraction process
-const wasUpdated = await runExtractor(config);
-console.log('Files updated:', wasUpdated);
+const { anyFileUpdated, hasErrors } = await runExtractor(config);
+console.log('Files updated:', anyFileUpdated);
 
 // Check translation status programmatically
 await runStatus(config);

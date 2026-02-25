@@ -51,7 +51,7 @@ export async function runExtractor (
     quiet?: boolean,
     logger?: Logger
   } = {}
-): Promise<boolean> {
+): Promise<{ anyFileUpdated: boolean; hasErrors: boolean }> {
   config.extract.primaryLanguage ||= config.locales[0] || 'en'
   config.extract.secondaryLanguages ||= config.locales.filter((l: string) => l !== config?.extract?.primaryLanguage)
 
@@ -67,7 +67,8 @@ export async function runExtractor (
   const spinner = createSpinnerLike('Running i18next key extractor...\n', { quiet: !!options.quiet, logger: options.logger })
 
   try {
-    const { allKeys, objectKeys } = await findKeys(config, internalLogger)
+    const fileErrors: string[] = []
+    const { allKeys, objectKeys } = await findKeys(config, internalLogger, fileErrors)
     spinner.text = `Found ${allKeys.size} unique keys. Updating translation files...`
 
     const results = await getTranslations(allKeys, objectKeys, config, {
@@ -111,7 +112,7 @@ export async function runExtractor (
     // Show the funnel message only if files were actually changed.
     if (anyFileUpdated) await printLocizeFunnel(options.logger)
 
-    return anyFileUpdated
+    return { anyFileUpdated, hasErrors: fileErrors.length > 0 }
   } catch (error) {
     spinner.fail(styleText('red', 'Extraction failed.'))
     // Re-throw or handle error
@@ -145,7 +146,8 @@ export async function processFile (
   astVisitors: ASTVisitors,
   pluginContext: PluginContext,
   config: Omit<I18nextToolkitConfig, 'plugins'>,
-  logger: Logger = new ConsoleLogger()
+  logger: Logger = new ConsoleLogger(),
+  fileErrors?: string[]
 ): Promise<void> {
   try {
     let code = await readFile(file, 'utf-8')
@@ -252,6 +254,9 @@ export async function processFile (
     if ((!err?.message || String(err.message).trim() === '') && err?.stack) {
       logger.warn(`  ${String(err.stack)}`)
     }
+
+    // Record the failure so callers can exit non-zero even though we continue extraction
+    fileErrors?.push(file)
   }
 }
 

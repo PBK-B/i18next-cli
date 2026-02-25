@@ -93,7 +93,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
 
     // Run extractor with syncPrimaryWithDefaults enabled
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     // Check primary language (en) - should sync with code defaults
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
@@ -142,7 +142,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
 
     // Run extractor without syncPrimaryWithDefaults (default behavior)
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: false })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     // Primary language should preserve existing value
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
@@ -177,7 +177,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -220,7 +220,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -264,7 +264,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(false) // No changes should be made since we're preserving existing values
+    expect(result.anyFileUpdated).toBe(false) // No changes should be made since we're preserving existing values
 
     // Both languages should preserve their plural forms
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
@@ -308,7 +308,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -341,7 +341,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -373,7 +373,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -422,7 +422,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -465,7 +465,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -504,7 +504,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -548,7 +548,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true) // Changes are made because new key is added
+    expect(result.anyFileUpdated).toBe(true) // Changes are made because new key is added
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -589,7 +589,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -628,7 +628,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -685,7 +685,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     expect(enContent).toEqual(existing)
 
     // No changes should be needed — existing plural forms must be preserved.
-    expect(result).toBe(false)
+    expect(result.anyFileUpdated).toBe(false)
   })
 
   it('should sync primary language when syncPrimaryWithDefaults is true but only for keys with code defaults', async () => {
@@ -715,7 +715,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -771,7 +771,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     expect(enContent).toEqual(existing)
 
     // No changes should be needed — existing plural forms must be preserved.
-    expect(result).toBe(false)
+    expect(result.anyFileUpdated).toBe(false)
   })
 
   it('should sync primary language when syncPrimaryWithDefaults is true but only for keys with code defaults (without specifying defaultValue)', async () => {
@@ -801,7 +801,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -862,7 +862,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
 
     // Run extractor with syncPrimaryWithDefaults enabled
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     // Check primary language (en) - should sync with code defaults
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
@@ -921,7 +921,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true) // Changes are made because new key is added
+    expect(result.anyFileUpdated).toBe(true) // Changes are made because new key is added
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -961,7 +961,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -1000,7 +1000,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['/src/App.tsx'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({
@@ -1041,7 +1041,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['/src/App.tsx'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({ app: { greeting: 'Hello from Trans' } })
@@ -1069,7 +1069,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['/src/App.tsx'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({ 'Inline default text': '', app: { greeting: 'Old greeting' } })
@@ -1098,7 +1098,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue(['/src/App.tsx'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     // Default may be serialized with placeholders; at minimum it must contain the visible text parts
@@ -1202,7 +1202,7 @@ describe('extractor: runExtractor (sync primary language defaults)', () => {
     vi.mocked(glob).mockResolvedValue([appPath, keyPrefixPath])
 
     const result = await runExtractor(configWithTodo, { syncPrimaryWithDefaults: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({

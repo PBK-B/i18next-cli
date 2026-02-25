@@ -58,7 +58,7 @@ describe('extract: no namespace with custom plugin', () => {
 
     // Run extractor
     const updated = await runExtractor(config, { isDryRun: false })
-    expect(updated).toBe(true)
+    expect(updated.anyFileUpdated).toBe(true)
 
     const en = JSON.parse(await fs.readFile(join(tempDir, 'src', 'locales', 'en.json'), 'utf-8'))
     // Should NOT have a top-level "false" key

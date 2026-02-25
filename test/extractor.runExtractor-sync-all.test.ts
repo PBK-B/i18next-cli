@@ -50,7 +50,7 @@ describe('extractor: --sync-all', () => {
     vi.mocked(glob).mockResolvedValue(['/src/app.ts'])
 
     const result = await runExtractor(mockConfig, { syncPrimaryWithDefaults: true, syncAll: true })
-    expect(result).toBe(true)
+    expect(result.anyFileUpdated).toBe(true)
 
     const enContent = JSON.parse(vol.readFileSync(enPath, 'utf8') as string)
     expect(enContent).toEqual({ app: { title: 'Primary Default' } })

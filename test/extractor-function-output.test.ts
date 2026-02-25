@@ -52,7 +52,7 @@ describe('runExtractor with functional extract.output', () => {
     }
 
     const updated = await runExtractor(config, { isDryRun: false })
-    expect(updated).toBe(true)
+    expect(updated.anyFileUpdated).toBe(true)
 
     const content = await vol.promises.readFile(resolve('/project', 'packages/pkg/locales/en/pkg.json'), 'utf8')
     expect(content).toContain('"key": "Value"')

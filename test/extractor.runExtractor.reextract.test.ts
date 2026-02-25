@@ -56,7 +56,7 @@ describe('reproducer: plural re-extract corruption', () => {
 
     // First run
     const updated1 = await runExtractor(config, { isDryRun: false })
-    expect(updated1).toBe(true)
+    expect(updated1.anyFileUpdated).toBe(true)
 
     const en1 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'en.json'), 'utf-8'))
     const ar1 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'ar.json'), 'utf-8'))
@@ -91,7 +91,7 @@ describe('reproducer: plural re-extract corruption', () => {
 
     // Second run (re-extract)
     const updated2 = await runExtractor(config, { isDryRun: false })
-    expect(updated2).toBe(true)
+    expect(updated2.anyFileUpdated).toBe(true)
 
     const en2 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'en.json'), 'utf-8'))
     const ar2 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'ar.json'), 'utf-8'))
@@ -135,7 +135,7 @@ describe('reproducer: plural re-extract corruption', () => {
 
     // First run
     const updated1 = await runExtractor(config, { isDryRun: false })
-    expect(updated1).toBe(true)
+    expect(updated1.anyFileUpdated).toBe(true)
 
     const en1 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'en.json'), 'utf-8'))
     const ar1 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'ar.json'), 'utf-8'))
@@ -174,7 +174,7 @@ describe('reproducer: plural re-extract corruption', () => {
 
     // Second run (re-extract)
     const updated2 = await runExtractor(config, { isDryRun: false })
-    expect(updated2).toBe(true)
+    expect(updated2.anyFileUpdated).toBe(true)
 
     const en2 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'en.json'), 'utf-8'))
     const ar2 = JSON.parse(await fs.readFile(join(tempDir, 'locales', 'ar.json'), 'utf-8'))
@@ -211,7 +211,7 @@ describe('reproducer: plural re-extract corruption', () => {
 
     // First run -> produces merged per-language file with 2-space indentation
     const updated1 = await runExtractor(config1, { isDryRun: false })
-    expect(updated1).toBe(true)
+    expect(updated1.anyFileUpdated).toBe(true)
 
     const enPath = join(tempDir, 'locales', 'en.json')
     const content1 = await fs.readFile(enPath, 'utf-8')
@@ -238,7 +238,7 @@ describe('reproducer: plural re-extract corruption', () => {
 
     // Second run -> should rewrite the file with 6-space indentation
     const updated2 = await runExtractor(config1, { isDryRun: false })
-    expect(updated2).toBe(true)
+    expect(updated2.anyFileUpdated).toBe(true)
 
     const content2 = await fs.readFile(enPath, 'utf-8')
 
