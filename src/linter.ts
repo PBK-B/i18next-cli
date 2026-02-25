@@ -6,7 +6,7 @@ import { EventEmitter } from 'node:events'
 import { styleText } from 'node:util'
 import { ConsoleLogger } from './utils/logger'
 import { createSpinnerLike } from './utils/wrap-ora'
-import type { I18nextToolkitConfig, Logger, LintIssue, Plugin } from './types'
+import type { I18nextToolkitConfig, Logger, LintIssue, Plugin, LintPluginContext } from './types'
 
 /**
  * Loads all translation values from the primary locale's JSON files and returns
@@ -276,10 +276,12 @@ const defaultIgnoredTags = ['script', 'style', 'code']
 
 export class Linter extends EventEmitter<LinterEventMap> {
   private config: I18nextToolkitConfig
+  private logger: Logger
 
-  constructor (config: I18nextToolkitConfig) {
+  constructor (config: I18nextToolkitConfig, logger: Logger = new ConsoleLogger()) {
     super({ captureRejections: true })
     this.config = config
+    this.logger = logger
   }
 
   wrapError (error: unknown) {
@@ -315,7 +317,8 @@ export class Linter extends EventEmitter<LinterEventMap> {
       // to their translated strings (fixes: key != value interpolation not detected)
       const translationValues = await loadPrimaryTranslationValues(config)
       const plugins = config.plugins || []
-      await this.initializeLintPlugins(plugins)
+      const lintPluginContext = this.createLintPluginContext(config)
+      await this.initializeLintPlugins(plugins, lintPluginContext)
       let totalIssues = 0
       const issuesByFile = new Map<string, LintIssue[]>()
 
@@ -401,10 +404,17 @@ export class Linter extends EventEmitter<LinterEventMap> {
     }
   }
 
-  private async initializeLintPlugins (plugins: Plugin[]): Promise<void> {
+  private createLintPluginContext (config: I18nextToolkitConfig): LintPluginContext {
+    return {
+      config,
+      logger: this.logger,
+    }
+  }
+
+  private async initializeLintPlugins (plugins: Plugin[], context: LintPluginContext): Promise<void> {
     for (const plugin of plugins) {
       try {
-        await plugin.lintSetup?.()
+        await plugin.lintSetup?.(context)
       } catch (err) {
         const wrapped = this.wrapError(err)
         this.emit('error', wrapped)
@@ -500,7 +510,7 @@ export async function runLinterCli (
   options: { quiet?: boolean, logger?: Logger } = {}
 ) {
   const internalLogger = options.logger ?? new ConsoleLogger()
-  const linter = new Linter(config)
+  const linter = new Linter(config, internalLogger)
   const spinner = createSpinnerLike('', { quiet: !!options.quiet, logger: options.logger })
   linter.on('progress', (event) => {
     spinner.text = event.message

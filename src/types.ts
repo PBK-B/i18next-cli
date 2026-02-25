@@ -298,6 +298,17 @@ export interface LintIssue {
 }
 
 /**
+ * Context object provided to linter plugin hooks.
+ */
+export interface LintPluginContext {
+  /** The fully resolved i18next-cli configuration. */
+  config: I18nextToolkitConfig;
+
+  /** The logger instance used by the linter run. */
+  logger: Logger;
+}
+
+/**
  * Linter-specific plugin hooks.
  *
  * This interface is kept separate so lint capabilities can evolve
@@ -318,7 +329,7 @@ export interface LinterPlugin {
    * Hook called once at the beginning of the linting process.
    * Use for initialization required by lint hooks.
    */
-  lintSetup?: () => MaybePromise<void>;
+  lintSetup?: (context: LintPluginContext) => MaybePromise<void>;
 
   /**
    * Hook called for each source file before lint parsing.

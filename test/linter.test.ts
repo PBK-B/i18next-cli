@@ -1,7 +1,7 @@
 import { vol } from 'memfs'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Linter, runLinter } from '../src/linter'
-import type { I18nextToolkitConfig, Plugin } from '../src/index'
+import type { I18nextToolkitConfig, Plugin, LintPluginContext } from '../src/index'
 
 // --- MOCKS ---
 vi.mock('fs/promises', async () => {
@@ -1366,10 +1366,12 @@ describe('Linter (core logic)', () => {
 
   it('should run lintSetup once and apply lintOnLoad transforms', async () => {
     let setupCalls = 0
+    let receivedContext: LintPluginContext | undefined
     const plugin: Plugin = {
       name: 'lint-setup-and-transform',
-      lintSetup: async () => {
+      lintSetup: async (context) => {
         setupCalls += 1
+        receivedContext = context
       },
       lintOnLoad: async (code, filePath) => {
         if (filePath.endsWith('.tsx')) {
@@ -1395,6 +1397,8 @@ describe('Linter (core logic)', () => {
     const result = await runLinter(config)
 
     expect(setupCalls).toBe(1)
+    expect(receivedContext).toBeDefined()
+    expect(receivedContext?.config.locales).toEqual(['en'])
     expect(result.success).toBe(false)
     expect(result.files['/src/App.tsx']).toHaveLength(1)
     expect(result.files['/src/App.tsx'][0].text).toBe('Text from transformed tsx')
