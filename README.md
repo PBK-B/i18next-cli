@@ -7,6 +7,10 @@ A unified, high-performance i18next CLI toolchain, powered by SWC.
 
 ---
 
+
+> By default, `i18next-cli` only extracts translation keys from JavaScript and TypeScript files (`.js`, `.jsx`, `.ts`, `.tsx`).
+> To extract from other file types (such as `.pug`, `.vue`, `.svelte`, etc.), you must use or create a plugin. Specifying additional file extensions in the `extract.input` config is not sufficient on its own—plugins are required for non-JS/TS formats. See the [Plugin System](#plugin-system) section for details and examples.
+
 `i18next-cli` is a complete reimagining of the static analysis toolchain for the i18next ecosystem. It consolidates key extraction, type safety generation, locale syncing, linting, and cloud integrations into a single, cohesive, and blazing-fast CLI.
 
 > ### 🚀 Try it Now - Zero Config!
@@ -79,6 +83,7 @@ Get an overview of your project's localization health:
 ```bash
 npx i18next-cli status
 ```
+
 
 ### 3. Extract Translation Keys
 
@@ -336,6 +341,7 @@ The configuration file supports both TypeScript (`.ts`) and JavaScript (`.js`) f
 
 > **💡 No Installation Required?** If you don't want to install `i18next-cli` as a dependency, you can skip the `defineConfig` helper and return a plain JavaScript object or JSON instead. The `defineConfig` function is purely for TypeScript support and doesn't affect functionality.
 
+
 ### Basic Configuration
 
 ```typescript
@@ -350,6 +356,9 @@ export default defineConfig({
   },
 });
 ```
+
+> **❗ Important:**
+> Only `.js`, `.jsx`, `.ts`, and `.tsx` files are extracted by default. If you want to extract from other file types (e.g., `.pug`, `.vue`), you must use or create a plugin. See the [Plugin System](#plugin-system) section for more information.
 
 **Alternative without local installation:**
 
